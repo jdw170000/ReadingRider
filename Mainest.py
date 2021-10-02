@@ -3,6 +3,7 @@ import pyglet
 from pyglet.gl import *
 from pyglet.window import key
 from pyglet.window import Window
+from pyglet import clock
 from pyglet import app
 import math
 import json
@@ -11,146 +12,97 @@ import os
 #Car vars
 turning = 0
 acceleration = 0
-velocity = 0
-rotation = math.pi # [0, 2pi)
+velocity_Y = 0
+velocity_X = 0
 posX = 0
 posY = 0
+batch2 = pyglet.graphics.Batch()
+playerTriangle = pyglet.shapes.Triangle(385, 10, 415, 10, 400, 40, color=(100, 150, 0), batch=batch2, group=pyglet.graphics.OrderedGroup(2))
 
 #path vars
 pathIndex = 0
 path = []
-nextFiveWords = []
-distanceTravelledY = 0
-wordRects = []
+nextWords = []
+distanceScrolledY = 0
+labelledRects = []
 
 #key handler
 keys = key.KeyStateHandler()
 
-def MoveCheckCollisions():
+def MoveCheckCollisions(arg):
     #TODO - collision checking
-    global velocity
-    global rotation
+    global velocity_Y, velocity_X
     global posX
     global posY
-    posX += velocity * math.cos(rotation + math.pi / 2)
-    posY += velocity * math.sin(rotation + math.pi / 2)
+    global playerTriangle
+    posY += velocity_Y
+    posX += velocity_X
 
 def LoadPath():
-    global nextFiveWords
+    global nextWords
     global pathIndex
     global path
-    file = open(os.getcwd()+"/paths/UTD_ALERT.path")
+    file = open(os.getcwd()+"/paths/TEST.path")
     pathJson = json.load(file)
     path = pathJson['text']
-    i = 0
-    while i < 5:
-        nextFiveWords.append(path[i])
-        i+=1
-    pass
+    nextWords = path
 
-def DrawBackground():
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(90, 1, 0.1, 100)
-
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-
-    glTranslatef(*[0, 0, -20])
-    glRotatef(10, 0, 0, 0)
-
-    glBegin(GL_POLYGON)
-    glVertex3f(-40,0,-40)
-    glVertex3f(40,0,-40)
-    glVertex3f(40,-40,0)
-    glVertex3f(-40,-40,0)
-    glEnd()
-
-    glFlush()
-
-def DrawPath():
-    global nextFiveWords
-    global distanceTravelledY
-    global posY
-    distanceRenderedY = 0
-
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(90, 1, 0.1, 1000)
-
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-
-    glTranslatef(*[0, 0, -20])
-    glRotatef(10, 0, 0, 0)
-
-    for word in nextFiveWords:
-        glColor3f(distanceRenderedY / 100+0.15,0.15,0.15)
-        glBegin(GL_POLYGON)
-        edge_len = 5*word[2]
-        const_offset = -40
-        const_z = -40
-        glVertex3f(-edge_len, 0 + const_offset + distanceRenderedY, const_z)
-        glVertex3f(edge_len, 0 + const_offset + distanceRenderedY, const_z)
-        glVertex3f(edge_len, -edge_len + const_offset + distanceRenderedY, const_z)
-        glVertex3f(-edge_len, -edge_len + const_offset + distanceRenderedY, const_z)
-        glEnd()
-        distanceRenderedY += edge_len
-
-    glFlush()
-
-def DrawPath2D(batch, background):
-    global nextFiveWords
-    global wordRects
-    sizeMultiplier = 30
-    bottomLeftX = 400 - nextFiveWords[-1][2] * sizeMultiplier / 2
-    bottomLeftY = 0
-    for word in nextFiveWords:    
+def DrawPath2D(batch, background, midground):
+    global nextWords
+    global labelledRects
+    global posY, poX
+    global distanceScrolledY
+    sizeMultiplier = 40
+    bottomLeftX = 400 - nextWords[0][2] * sizeMultiplier / 2 - posX
+    bottomLeftY = -posY
+    for word in nextWords:    
         width = word[2] * sizeMultiplier
         height = word[2] * sizeMultiplier
-        wordRects.append(pyglet.shapes.Rectangle(bottomLeftX, bottomLeftY, width, height, batch=batch, group=background))
+        rect = pyglet.shapes.Rectangle(bottomLeftX, bottomLeftY, width, height, batch=batch, group=background)
+        label = pyglet.text.Label(word[0],font_name="Consolas", font_size=50, x=bottomLeftX, y=bottomLeftY + height / 2 - 30, color=(0, 0, 0, 255), batch=batch, group=midground)
+        labelledRects.append((rect, label))
         bottomLeftX += width * word[1]
         bottomLeftY += height
 
-def DefineWindowEvents(window, batch, background):
+def DefineWindowEvents(window, background, midground):
     @window.event
     def on_draw():
         #this is the main loop
-        global turning
         global acceleration
-        global velocity
-        global rotation
+        global velocity_Y
         global posX
         global posY
+        global batch2
         #Car movement
-        rotation += turning * 1 # Constant to be adjusted later
-        while (rotation >= 2 * math.pi):
-            rotation += -2 * math.pi
-        velocity += acceleration * 1 # constant to be adjusted later
-        MoveCheckCollisions()
+        velocity_Y += acceleration * 1 # constant to be adjusted later
 
         #update graphics
         #DrawPath()
         window.clear()
         #DrawPath()
-        DrawPath2D(batch, background)
+        batch = pyglet.graphics.Batch()
+        DrawPath2D(batch, background, midground)
         batch.draw()
+        batch2.draw()
 
     @window.event
     def on_key_press(symbol, modifiers):
         global turning
         global acceleration
+        global velocity_X
         global keys
-        if keys[key.A]:
-            if turning > -1:
-                turning += -1
-        elif keys[key.D]:
-            if turning < 1:
-                turning += 1
-        elif keys[key.W]:
+        print(f'keypress: {velocity_X}')
+        print(f'{symbol}')
+        if symbol == key.A:
+            print(f'keypress: A')
+            velocity_X -= velocity_Y
+        elif symbol == key.D:
+            print(f'keypress: D')
+            velocity_X += velocity_Y
+        elif symbol == key.W:
             if acceleration < 1:
                 acceleration += 1
-        elif keys[key.S]:
+        elif symbol == key.S:
             if acceleration > -1:
                 acceleration += -1
     @window.event
@@ -158,24 +110,25 @@ def DefineWindowEvents(window, batch, background):
         global turning
         global acceleration
         global keys
-        if keys[key.A]:
-            if turning < 0:
-                turning += 1
-        elif keys[key.D]:
-            if turning > 0:
-                turning += -1
-        elif keys[key.W]:
+        global velocity_X
+        print(f'keyrelease: {velocity_X}')
+        if symbol == key.A:
+            velocity_X = 0
+        elif symbol == key.D:
+            velocity_X = 0
+        elif symbol == key.W:
             if acceleration > 0:
                 acceleration += -1
-        elif keys[key.S]:
+        elif symbol == key.S:
             if acceleration < 0:
                 acceleration += 1
 
 
 def main():
     global keys
+
     window = Window(width=800, height=800)
-    batch = pyglet.graphics.Batch()
+    
     background = pyglet.graphics.OrderedGroup(0)
     midground = pyglet.graphics.OrderedGroup(1)
     foreground = pyglet.graphics.OrderedGroup(2)
@@ -183,10 +136,11 @@ def main():
     window.push_handlers(keys)
 
     LoadPath()
-    DefineWindowEvents(window, batch, background)
-
+    
+    
+    DefineWindowEvents(window, background, midground)
+    clock.schedule(MoveCheckCollisions)
     app.run()
-
 
 if __name__ == "__main__":
     main()

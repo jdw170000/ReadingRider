@@ -3,7 +3,7 @@ import random
 import os
 
 def get_turn_amount():
-    MAX_TURN = 0.5
+    MAX_TURN = 0.3
     return random.uniform(-MAX_TURN, MAX_TURN)
 
 def get_tile_width(word: str):
