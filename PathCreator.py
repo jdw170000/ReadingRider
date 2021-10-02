@@ -3,7 +3,7 @@ import random
 import os
 
 def get_turn_amount():
-    MAX_TURN = 5
+    MAX_TURN = 0.5
     return random.uniform(-MAX_TURN, MAX_TURN)
 
 def get_tile_width(word: str):
@@ -19,7 +19,7 @@ def menu():
 
 def save_track(filename: str, track: dict):
     current_path = os.path.dirname(os.path.abspath(__file__))
-    os.makedirs(f'{current_path}/paths/')
+    os.makedirs(f'{current_path}/paths/', exist_ok=True)
     with open(f'{current_path}/paths/{filename}.path', 'w') as f:
         json.dump(track, f)
 
