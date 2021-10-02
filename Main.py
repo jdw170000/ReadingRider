@@ -13,6 +13,7 @@ def main():
     InputStack = InputHandler.RecentInputs()
     (window, batch) = PrepareWindow(InputStack)
     MainMenu(window, batch, InputStack)
+    app.run()
 
 def PrepareWindow(InputStack):
     window = Window(width=800, height=800)
