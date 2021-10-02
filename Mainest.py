@@ -43,7 +43,30 @@ def LoadPath():
         i+=1
     pass
 
-def DefineWindowEvents(window):
+def DrawBackground():
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(90, 1, 0.1, 100)
+
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+    glTranslatef(*[0, 0, -20])
+    glRotatef(0, 0, 1, 0)
+
+    glBegin(GL_POLYGON)
+    glVertex3f(-5,-5,0)
+    glVertex3f(5,-5,0)
+    glVertex3f(0,5,0)
+ #   glVertex3f(-400,0,400)
+  #  glVertex3f(400,0,400)
+   # glVertex3f(-400,-400,0)
+    #glVertex3f(400,-400,0)
+    glEnd()
+
+    glFlush()
+
+def DefineWindowEvents(window, batch):
     @window.event
     def on_draw():
         #this is the main loop
@@ -62,6 +85,7 @@ def DefineWindowEvents(window):
 
         #update graphics
         #DrawPath()
+        DrawBackground()
         window.clear()
         batch.draw()
 
@@ -109,7 +133,7 @@ def main():
     window.push_handlers(keys)
 
     LoadPath()
-    DefineWindowEvents(window)
+    DefineWindowEvents(window, batch)
 
     app.run()
 
