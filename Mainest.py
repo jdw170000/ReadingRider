@@ -49,10 +49,10 @@ def main():
             if turning < 1:
                 turning += 1
         elif keys[key.W]:
-            if accelleration < 1:
+            if acceleration < 1:
                 acceleration += 1
         elif keys[key.S]:
-            if accelleration > -1:
+            if acceleration > -1:
                 acceleration += -1
     @window.event
     def on_key_release(symbol, modifiers):
@@ -63,10 +63,10 @@ def main():
             if turning > 0:
                 turning += -1
         elif keys[key.W]:
-            if accelleration > 0:
+            if acceleration > 0:
                 acceleration += -1
         elif keys[key.S]:
-            if accelleration < 0:
+            if acceleration < 0:
                 acceleration += 1
 
     app.run()
