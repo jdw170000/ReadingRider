@@ -21,6 +21,9 @@ pathIndex = 0
 path = []
 nextFiveWords = []
 
+#key handler
+keys = key.KeyStateHandler()
+
 def MoveCheckCollisions():
     #TODO - collision checking
     global velocity
@@ -52,16 +55,13 @@ def DrawBackground():
     glLoadIdentity()
 
     glTranslatef(*[0, 0, -20])
-    glRotatef(0, 0, 1, 0)
+    glRotatef(10, 0, 0, 0)
 
     glBegin(GL_POLYGON)
-    glVertex3f(-5,-5,0)
-    glVertex3f(5,-5,0)
-    glVertex3f(0,5,0)
- #   glVertex3f(-400,0,400)
-  #  glVertex3f(400,0,400)
-   # glVertex3f(-400,-400,0)
-    #glVertex3f(400,-400,0)
+    glVertex3f(-40,0,-40)
+    glVertex3f(40,0,-40)
+    glVertex3f(40,-40,0)
+    glVertex3f(-40,-40,0)
     glEnd()
 
     glFlush()
@@ -85,14 +85,15 @@ def DefineWindowEvents(window, batch):
 
         #update graphics
         #DrawPath()
-        DrawBackground()
         window.clear()
+        DrawBackground()
         batch.draw()
 
     @window.event
     def on_key_press(symbol, modifiers):
         global turning
         global acceleration
+        global keys
         if keys[key.A]:
             if turning > -1:
                 turning += -1
@@ -109,6 +110,7 @@ def DefineWindowEvents(window, batch):
     def on_key_release(symbol, modifiers):
         global turning
         global acceleration
+        global keys
         if keys[key.A]:
             if turning < 0:
                 turning += 1
@@ -124,12 +126,13 @@ def DefineWindowEvents(window, batch):
 
 
 def main():
+    global keys
     window = Window(width=800, height=800)
     batch = pyglet.graphics.Batch()
     background = pyglet.graphics.OrderedGroup(0)
     midground = pyglet.graphics.OrderedGroup(1)
     foreground = pyglet.graphics.OrderedGroup(2)
-    keys = key.KeyStateHandler()
+    
     window.push_handlers(keys)
 
     LoadPath()
