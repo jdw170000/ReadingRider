@@ -12,5 +12,5 @@ def GenericDraw(window, batch):
 def GenericMousePress(InputStack, x, y, button):
     InputStack.addMouseInput(x, y, button)
 
-def GenericeKeyPress(InputStack, key):
+def GenericKeyPress(InputStack, key):
     InputStack.addKeyInput(key)
