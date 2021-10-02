@@ -16,6 +16,11 @@ rotation = math.pi # [0, 2pi)
 posX = 0
 posY = 0
 
+#path vars
+pathIndex = 0
+path = []
+nextFiveWords = []
+
 def MoveCheckCollisions():
     #TODO - collision checking
     global velocity
@@ -25,9 +30,18 @@ def MoveCheckCollisions():
     posX += velocity * math.cos(rotation + math.pi / 2)
     posY += velocity * math.sin(rotation + math.pi / 2)
 
-def DrawPath():
+def LoadPath():
+    global nextFiveWords
+    global pathIndex
+    global path
     file = open(os.getcwd()+"/paths/UTD_ALERT.path")
     pathJson = json.load(file)
+    path = pathJson['text']
+    i = 0
+    while i < 5:
+        nextFiveWords.append(path[i])
+        i+=1
+    pass
 
 def DefineWindowEvents(window):
     @window.event
@@ -47,7 +61,7 @@ def DefineWindowEvents(window):
         MoveCheckCollisions()
 
         #update graphics
-        DrawPath()
+        #DrawPath()
         window.clear()
         batch.draw()
 
@@ -94,6 +108,7 @@ def main():
     keys = key.KeyStateHandler()
     window.push_handlers(keys)
 
+    LoadPath()
     DefineWindowEvents(window)
 
     app.run()
