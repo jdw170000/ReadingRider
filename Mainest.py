@@ -38,7 +38,7 @@ def main():
 
         #update graphics
         window.clear()
-        batch.draw();
+        batch.draw()
 
     @window.event
     def on_key_press(symbol, modifiers):
