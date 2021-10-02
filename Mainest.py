@@ -20,6 +20,8 @@ posY = 0
 pathIndex = 0
 path = []
 nextFiveWords = []
+distanceTravelledY = 0
+wordRects = []
 
 #key handler
 keys = key.KeyStateHandler()
@@ -66,7 +68,51 @@ def DrawBackground():
 
     glFlush()
 
-def DefineWindowEvents(window, batch):
+def DrawPath():
+    global nextFiveWords
+    global distanceTravelledY
+    global posY
+    distanceRenderedY = 0
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(90, 1, 0.1, 1000)
+
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+    glTranslatef(*[0, 0, -20])
+    glRotatef(10, 0, 0, 0)
+
+    for word in nextFiveWords:
+        glColor3f(distanceRenderedY / 100+0.15,0.15,0.15)
+        glBegin(GL_POLYGON)
+        edge_len = 5*word[2]
+        const_offset = -40
+        const_z = -40
+        glVertex3f(-edge_len, 0 + const_offset + distanceRenderedY, const_z)
+        glVertex3f(edge_len, 0 + const_offset + distanceRenderedY, const_z)
+        glVertex3f(edge_len, -edge_len + const_offset + distanceRenderedY, const_z)
+        glVertex3f(-edge_len, -edge_len + const_offset + distanceRenderedY, const_z)
+        glEnd()
+        distanceRenderedY += edge_len
+
+    glFlush()
+
+def DrawPath2D(batch, background):
+    global nextFiveWords
+    global wordRects
+    sizeMultiplier = 30
+    bottomLeftX = 400 - nextFiveWords[-1][2] * sizeMultiplier / 2
+    bottomLeftY = 0
+    for word in nextFiveWords:    
+        width = word[2] * sizeMultiplier
+        height = word[2] * sizeMultiplier
+        wordRects.append(pyglet.shapes.Rectangle(bottomLeftX, bottomLeftY, width, height, batch=batch, group=background))
+        bottomLeftX += width * word[1]
+        bottomLeftY += height
+
+def DefineWindowEvents(window, batch, background):
     @window.event
     def on_draw():
         #this is the main loop
@@ -86,7 +132,8 @@ def DefineWindowEvents(window, batch):
         #update graphics
         #DrawPath()
         window.clear()
-        DrawBackground()
+        #DrawPath()
+        DrawPath2D(batch, background)
         batch.draw()
 
     @window.event
@@ -136,7 +183,7 @@ def main():
     window.push_handlers(keys)
 
     LoadPath()
-    DefineWindowEvents(window, batch)
+    DefineWindowEvents(window, batch, background)
 
     app.run()
 
