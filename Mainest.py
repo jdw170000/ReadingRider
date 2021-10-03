@@ -124,8 +124,8 @@ def QuizMode(batch3):
     random.shuffle(question[1])
     answerButtons.clear()
     for answer in question[1]:
-        answer_button = Button(batch3, 0, answer, x, y, width*len(answer), height)
-        answer_button.set_click_event(lambda: answer == correct_answer)
+        correct = answer == correct_answer
+        answer_button = Button(batch3, 0, answer, x, y, width*len(answer), height, correct)
         answerButtons.append(answer_button)
         x += 10 + width*len(answer)
     return False

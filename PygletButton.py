@@ -2,7 +2,7 @@ from typing import Callable
 import pyglet
 
 class Button:
-    def __init__(self, batch, order, text, x, y, width, height, font_name='Times New Roman', font_size=36):
+    def __init__(self, batch, order, text, x, y, width, height, correct, font_name='Times New Roman', font_size=36):
         self.batch = batch
 
         button_layer = pyglet.graphics.OrderedGroup(order)
@@ -18,9 +18,7 @@ class Button:
         self.height = height
         self.font_name = font_name
         self.font_size = font_size
-    
-    def set_click_event(self, func: Callable):
-        self.on_click = func
+        self.on_click = lambda: correct
 
     def is_clicked(self, click_x, click_y):
         return (self.x <= click_x <= self.x + self.width) and (self.y <= click_y <= self.y + self.height)
